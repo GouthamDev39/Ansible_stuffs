@@ -1,0 +1,10 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for uninstall_service
+- name: Uninsatll Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: absent
+    purge: true
+  become: true
+  tags: uninstall_service

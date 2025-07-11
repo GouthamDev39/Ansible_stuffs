@@ -1,0 +1,78 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for base
+
+- name: Ping my hots
+  ansible.builtin.ping:
+  tags:
+    - base
+    - app
+    - ssh
+    
+- name: Print Message
+  ansible.builtin.debug:
+    msg: Hello World
+  tags: base
+    
+# - name: Update and upgrade
+#   apt:
+#     upgrade: Yes
+#     update_cache: yes
+#   become: true
+#   tags: base
+
+- name: Install ufw
+  apt:
+    name: ufw
+    state: present
+  become: true
+  tags: base
+
+- name: Install fail2ban
+  apt:
+    name: fail2ban
+    state: present
+  become: true
+  tags: base
+
+- name: Ensure home dir is accessible to others
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}
+    mode: '0751'
+    state: directory
+    recurse: no
+
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+  become: true
+  tags: base
+
+- name: Allow HTTP
+  ansible.builtin.ufw:
+    rule: allow
+    port: 80
+    proto: tcp
+  become: true
+  tags: base
+
+- name: Allow SSH
+  ansible.builtin.ufw:
+    rule: allow
+    port: 22
+    proto: tcp
+  become: true
+  tags: base
+
+
+- name: Check if pip is installed/install pip
+  apt:
+    name: 
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: yes
+  become: true
+  tags: base
+

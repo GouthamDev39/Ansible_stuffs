@@ -1,0 +1,65 @@
+- name: Test play
+  hosts: myhosts
+  vars:
+    user: redhood
+  remote_user: "{{ user }}"
+  
+
+  tasks:
+    - name: Ping Hostname
+      ping:
+
+    - name: Who am I
+      command: whoami
+      register: result
+
+    - name: Show user
+      debug:
+        var: result.stdout
+
+    - name: Show metadata (facts)
+      debug:
+        var: ansible_facts
+
+    # - name: Update and upgrade
+    #   apt:
+    #     upgrade: Yes
+    #     update_cache: yes
+
+    - name: Create a secure bin directory for the user
+      file:
+        path: "/home/{{ user }}/bin"
+        state: directory
+        owner: "{{ user }}"
+        group: "{{ user }}"
+        mode: '0755'
+
+
+    - name: Add file to Directory
+      file:
+        path: "/home/{{ user }}/bin/test_file"
+        state: touch        
+        owner: "{{ user }}"
+        mode: '0644'  
+
+    - name: Add stuffs in the file
+      copy:
+        src: /home/batman/bin/load_check.sh
+        dest: /home/{{ user }}/bin/test_file 
+
+
+    # - name: Insatll net-tools
+    #   apt:
+    #     name: net-tools
+    #     state: present
+      
+
+   
+      
+    # - name: Copy and setup netdata via script
+    #   script: 
+    #     cmd: /home/batman/bin/set_up_netdata.sh
+    #   args: 
+    #     creates: /opt/netdata
+
+    

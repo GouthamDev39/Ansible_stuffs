@@ -1,0 +1,51 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for app
+    - name: Ensure unzip is installed
+      ansible.builtin.package:
+        name: unzip
+        state: present
+      become: true
+      tags: app
+
+    - name: Create destination directory for tar file
+      ansible.builtin.file:
+        path: /tmp/zip
+        state: directory
+        mode: '0755'
+      tags: app
+
+    - name: Copy tar files 
+      ansible.builtin.copy:
+        src: test_project.tar.gz
+        dest: /tmp/zip/
+      tags: app
+
+    - name: Unarchive the file
+      ansible.builtin.unarchive:
+        src: /tmp/zip/test_project.tar.gz
+        dest: /home/{{ ansible_user }}/
+        remote_src: yes
+      tags: app
+
+    - name: Check if requirements.txt exists
+      ansible.builtin.stat:
+        path: /home/{{ ansible_user }}/test_project/requirements.txt
+      register: requirements_file
+      tags: app
+
+    - name: Setup virtual environment and install requirements
+      ansible.builtin.pip:
+        requirements: /home/{{ ansible_user }}/test_project/requirements.txt
+        virtualenv: /home/{{ ansible_user }}/test_project/website-venv
+        virtualenv_command: /usr/bin/python3 -m venv
+      when: requirements_file.stat.exists
+      tags: app
+
+
+
+        # - name: Curl and check
+    #   ansible.builtin.uri:
+    #     url: http://localhost
+    #     status_code: 200
+    #   tags: app
