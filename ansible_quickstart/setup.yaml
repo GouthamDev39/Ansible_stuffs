@@ -1,0 +1,14 @@
+- name: My first play
+  hosts: myhosts
+  remote_user: root
+  vars:
+    ansible_user: redhood
+    ansible_become_password: redhood
+
+
+  roles:
+    - base
+    - app
+    - gunicorn
+    - nginx
+    - ssh

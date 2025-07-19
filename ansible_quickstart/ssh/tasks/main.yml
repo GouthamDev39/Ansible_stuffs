@@ -1,0 +1,37 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ssh
+
+- name: Validate the .ssh directory is present
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/.ssh
+    state: directory
+    mode: '0700'
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  tags: ssh
+
+- name: Ensure public key is in authorized_keys
+  ansible.builtin.lineinfile:
+    path: /home/{{ ansible_user }}/.ssh/authorized_keys
+    line: "{{ lookup('file', 'webserverkey') }}"
+    create: yes
+    state: present
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+  tags: ssh
+
+
+
+- name: Wait for app to respond through Nginx
+  ansible.builtin.uri:
+    url: http://localhost/
+    status_code: 200
+  register: app_status
+  retries: 5
+  delay: 3
+  until: app_status.status == 200
+  tags: ssh
+
+

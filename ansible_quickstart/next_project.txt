@@ -1,0 +1,4 @@
+Build upon your previous work by deploying a Python Flask web application behind nginx, with Gunicorn as the WSGI server. Configure HTTPS using Let's Encrypt, manage systemd services, and use Ansible roles for modular deployment.
+
+Usful stuffs
+

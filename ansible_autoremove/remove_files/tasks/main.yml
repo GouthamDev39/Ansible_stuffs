@@ -1,0 +1,31 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for remove_files
+- name: Remove file
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/test_project
+    state: absent
+  tags: remove_files
+
+- name: Stop and disable gunicorn (before removing)
+  ansible.builtin.systemd:
+    name: gunicorn
+    state: stopped
+    enabled: no
+  ignore_errors: yes
+  become: true
+  tags: remove_files
+
+
+- name: Remove Gunicorn config file
+  ansible.builtin.file:
+    path: /etc/systemd/system/gunicorn.service
+    state: absent
+  become: true
+  tags: remove_files
+
+- name: Daemon reload
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  become: true
+  tags: remove_files

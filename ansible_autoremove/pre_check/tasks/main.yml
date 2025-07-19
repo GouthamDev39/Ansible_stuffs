@@ -1,0 +1,12 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for pre_check
+- name: ping my hosts
+  ansible.builtin.ping:
+  tags:
+    - pre_check
+
+- name: Print Message
+  ansible.builtin.debug:
+    msg: Hello {{ ansible_user }}
+  tags: pre_check

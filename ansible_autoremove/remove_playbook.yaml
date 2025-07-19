@@ -1,0 +1,8 @@
+- name: Remove files and services
+  hosts: myhosts
+  vars_files:
+    - vault.yaml
+  
+  roles:
+    - pre_check
+    - remove_files

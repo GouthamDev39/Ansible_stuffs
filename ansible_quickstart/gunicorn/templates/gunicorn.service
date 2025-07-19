@@ -1,0 +1,19 @@
+[Unit]
+Description=Gunicorn daemon for test_project
+After=network.target
+ExecStartPost=/bin/chmod 666 /home/{{ ansible_user }}/test_project/gunicorn.sock
+
+[Service]
+User={{ ansible_user }}
+Group=www-data
+WorkingDirectory=/home/{{ ansible_user }}/test_project
+ExecStart=/home/{{ ansible_user }}/test_project/website-venv/bin/gunicorn \
+    --workers 3 \
+    --bind unix:/home/{{ ansible_user }}/test_project/gunicorn.sock \
+    --access-logfile - \
+    --error-logfile - \
+    test_project.wsgi:application
+
+
+[Install]
+WantedBy=multi-user.target

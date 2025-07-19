@@ -1,0 +1,4 @@
+/venv
+inventory.ini
+vars.yaml
+ansible_test_key.pem 

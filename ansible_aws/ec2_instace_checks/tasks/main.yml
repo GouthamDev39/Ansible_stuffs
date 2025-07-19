@@ -1,0 +1,65 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ec2_instace_checks
+- name: Show hostname
+  ansible.builtin.debug:
+    var: ansible_hostname
+  tags: ec2_instace_checks
+
+# - name: Show metadata
+#   ansible.builtin.debug:
+#     var: ansible_facts
+#   tags: ec2_instace_checks
+
+# - name: Update and upgrade
+#   ansible.builtin.apt:
+#     upgrade: yes
+#     update_cache: yes
+#   tags: ec2_instace_checks
+
+- name: Print Message
+  ansible.builtin.debug:
+    msg: Hello World
+  tags: ec2_instace_checks
+    
+- name: Create Directory
+  ansible.builtin.file:
+    path: test_dir/
+    state: directory
+    mode: '0755'
+  tags: ec2_instace_checks
+
+- name: Touch a file
+  ansible.builtin.file:
+    path: test_dir/test_file.txt
+    state: touch
+    mode: '0755'
+  tags: ec2_instace_checks
+
+- name: Insatll Nginx
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  become: true
+  tags: ec2_instace_checks
+
+- name: Copy html file
+  ansible.builtin.template:
+    src: index.html
+    dest: /var/www/html/index.nginx-debian.html
+  notify:
+    - Restart Nginx
+  become: true
+  tags: ec2_instace_checks
+
+- name: Check if pip is installed/install pip
+  apt:
+    name: 
+      - python3-pip
+      - python3-venv
+    state: present
+    update_cache: yes
+  become: true
+  tags: ec2_instace_checks
+

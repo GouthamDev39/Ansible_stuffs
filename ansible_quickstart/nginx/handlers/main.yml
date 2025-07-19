@@ -1,0 +1,17 @@
+#SPDX-License-Identifier: MIT-0
+---
+# handlers file for nginx
+- name: Reload nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+  become: true
+
+- name: Always restart nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  become: true
+  changed_when: true

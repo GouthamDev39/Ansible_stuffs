@@ -1,0 +1,30 @@
+- name: Provision EC2 instance
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+    - vars.yaml
+
+  tasks:
+    - name: Launch EC2 instance
+      amazon.aws.ec2_instance:
+        name: "my-ansible-instance"
+        key_name: "{{ ec2_key_name }}"
+        instance_type: "{{ ec2_instance_type }}"
+        image_id: "{{ ec2_ami }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        wait: yes
+        #count: 1
+        exact_count: 1
+        filters:
+          "tag:Name": "my-ansible-instance"
+        tags:
+          Name: "my-ansible-instance"
+      register: ec2_result      
+
+
+    - name: Show instance public IP
+      debug:
+        msg: "Public IP is {{ ec2_result.instances[0].public_ip_address }}"

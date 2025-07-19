@@ -1,0 +1,60 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for nginx
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+  become: true
+  tags: nginx
+    
+- name: Is Nginx Running?
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: yes
+  become: true
+  tags: nginx
+
+- name: Rewrite default file
+  ansible.builtin.template:
+    src: my-sites.conf
+    dest: /etc/nginx/sites-available/my-sites
+  become: true
+  notify:
+    - Reload nginx
+  tags: nginx
+
+- name: Remove default file
+  ansible.builtin.file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+  become: true
+  tags: nginx
+
+- name: Enable site
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/my-sites
+    dest: /etc/nginx/sites-enabled/my-sites
+    force: yes
+    state: link
+  become: true
+  notify: 
+      - Reload nginx
+      - Restart nginx
+  tags: nginx
+
+
+- name: Test nginx config
+  ansible.builtin.command: nginx -t
+  register: nginx_test
+  failed_when: nginx_test.rc != 0
+  become: true
+  tags: nginx
+
+
+# - name: Hostname variable
+#   ansible.builtin.template:
+#     src: test.html
+#     dest: /var/www/html/index.nginx-debian.html

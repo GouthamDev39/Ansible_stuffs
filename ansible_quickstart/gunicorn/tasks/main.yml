@@ -1,0 +1,66 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for gunicorn
+
+#errorlog = "/var/log/gunicorn/error.log"
+
+- name: Deploy Gunicorn config
+  ansible.builtin.template:
+    src: gunicorn_config.py
+    dest: /home/{{ ansible_user }}/test_project/gunicorn_config.py
+    owner: "{{ ansible_user }}"
+    mode: '0644'
+  tags: gunicorn
+
+- name: Ensure log directory exists
+  ansible.builtin.file:
+    path: /var/log/gunicorn
+    state: directory
+    owner: "{{ ansible_user }}"
+    mode: '0755'
+  become: true
+  tags: gunicorn
+
+- name: Create error and access log files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: touch
+    owner: "{{ ansible_user }}"
+    mode: '0644'
+  loop:
+    - "/var/log/gunicorn/access.log"
+    - "/var/log/gunicorn/error.log"
+  tags: gunicorn  
+
+
+- name: Create Gunicorn systemd service
+  ansible.builtin.template:
+    src: gunicorn.service
+    dest: /etc/systemd/system/gunicorn.service
+  notify:
+    - Reload systemd
+    - Restart gunicorn
+  become: true
+  tags: gunicorn
+
+- name: Always restart Gunicorn
+  ansible.builtin.systemd:
+    name: gunicorn
+    state: restarted
+    enabled: true
+    daemon_reload: yes
+  become: true
+  tags: gunicorn
+
+
+
+# - name: Check if Gunicorn is serving the app via Unix socket
+#   ansible.builtin.shell: >
+#     curl --silent --unix-socket /home/alfred/test_project/gunicorn.sock http://localhost/
+#   register: gunicorn_check
+#   retries: 5
+#   delay: 3
+#   until: gunicorn_check.rc == 0 and '"200 OK"' in gunicorn_check.stdout
+#   changed_when: false
+#   tags: gunicorn
+

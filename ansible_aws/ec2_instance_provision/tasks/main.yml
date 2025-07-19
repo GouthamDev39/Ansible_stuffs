@@ -1,0 +1,50 @@
+#SPDX-License-Identifier: MIT-0
+---
+# tasks file for ec2_instance_provision
+    # tasks:
+    # - name: Launch EC2 instance
+    #   amazon.aws.ec2_instance:
+    #     name: "my-ansible-instance"
+    #     key_name: "{{ ec2_key_name }}"
+    #     instance_type: "{{ ec2_instance_type }}"
+    #     region: "{{ aws_region }}"
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     image_id: "{{ ec2_ami }}"
+    #     wait: yes
+    #     count: 1
+    #     security_group: "{{ ec2_security_group }}"
+    #     tags:
+    #       Name: ansible-ec2
+    #   register: ec2
+
+ 
+    - name: Launch EC2 instance
+      amazon.aws.ec2_instance:
+        name: "my-ansible-instance"
+        key_name: "{{ ec2_key_name }}"
+        instance_type: "{{ ec2_instance_type }}"
+        image_id: "{{ ec2_ami }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        wait: yes
+        #count: 1
+        exact_count: 1
+        state: running
+        filters:
+          "tag:Name": "my-ansible-instance"
+        tags:
+          Name: "my-ansible-instance"
+      register: ec2_result     
+      tags: ec2_instance_provision 
+
+    - name: Show instance public IP
+      debug:
+        msg: "Public IP is {{ ec2_result.instances[0].public_ip_address }}"
+      tags: ec2_instance_provision
+    
+    - name: Add provisioned instance to dynamic group
+      add_host:
+        name: "{{ ec2_result.instances[0].public_ip_address }}"
+        groups: launched
